@@ -12,6 +12,8 @@ public class PlayerController : MonoBehaviour
     [SerializeField] private float minZ = -10f; // Minimum Z bound
     [SerializeField] private float maxZ = 10f; // Maximum Z bound
 
+    [SerializeField] private float sprintMultiplier = 1.5f; // Multiplier for sprint speed
+
     private Rigidbody rb; // Reference to the Rigidbody component
     private bool isGrounded; // To check if the player is on the ground
 
@@ -54,10 +56,16 @@ public class PlayerController : MonoBehaviour
 
     private Vector3 CalculateMovementDirection(float inputX, float inputZ)
     {
-        // Combine horizontal (X) and vertical (Z) movement with respective speeds
-        float movementX = inputX * sideSpeed;
-        float movementZ = inputZ * forwardSpeed;
-        return new Vector3(movementX, 0, movementZ); // Removed .normalized
+        // Determine if the shift key is pressed
+        bool isSprinting = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+
+        // Apply the sprint multiplier if sprinting
+        float speedMultiplier = isSprinting ? sprintMultiplier : 1f;
+
+        // Combine horizontal (X) and vertical (Z) movement with respective speeds and multiplier
+        float movementX = inputX * sideSpeed * speedMultiplier;
+        float movementZ = inputZ * forwardSpeed * speedMultiplier;
+        return new Vector3(movementX, 0, movementZ);
     }
 
     private void MoveCharacter(Vector3 direction)

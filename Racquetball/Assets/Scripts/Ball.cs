@@ -1,6 +1,7 @@
 using System.Collections;
 using UnityEngine;
 using TMPro;
+using UnityEngine.SceneManagement;
 
 public class Ball : MonoBehaviour
 {
@@ -18,13 +19,17 @@ public class Ball : MonoBehaviour
     [SerializeField] private float maxZForce = 15f; // Maximum value for the random Z force
 
     private int playerLives = 3;
-    private int playerScore = 0;
+    public static int playerScore = 0;
     private bool gameOver = false;
     private bool isCountingDown = false;
     private Vector3 initialPosition;
 
    [SerializeField] private float zVelocityIncreaseAmount = 1f; // Amount to add to the Z velocity on each collision
     private float zVelocityIncrease = 0f; // Tracks the current increase in Z velocity
+
+    [SerializeField] private SFXManager sfx;
+
+    [SerializeField] private SingleAudioPlayer sfx321;
 
     private void Start()
     {
@@ -65,6 +70,7 @@ public class Ball : MonoBehaviour
 
     private void HandlePlayerCollision(Collision collision)
     {
+        sfx.PlaySFX(0);
         // Apply a constant Z force within the specified range
         float constantZForce = Random.Range(minZForce, maxZForce);
 
@@ -113,10 +119,14 @@ public class Ball : MonoBehaviour
 
         if (gameOverUI != null) gameOverUI.SetActive(true);
         rb.velocity = Vector3.zero;
+
+         SceneManager.LoadScene("EndMenu");
     }
 
    private void ResetBall()
     {
+        sfx321.PlaySound();
+        
         if (isCountingDown) return;
 
         isCountingDown = true;
@@ -161,7 +171,7 @@ public class Ball : MonoBehaviour
         rb.AddForce(initialDirection * launchForce, ForceMode.Impulse); // Launch forward
     }
 
-    private void UpdateUI()
+    public void UpdateUI()
     {
         if (livesText != null) livesText.text = "Lives: " + playerLives;
         if (scoreText != null) scoreText.text = "Score: " + playerScore;
